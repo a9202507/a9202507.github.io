@@ -96,6 +96,12 @@ function updateEligibleParticipantsList() {
 
   document.getElementById("totalParticipants").textContent = total; //將參加人數投放到網頁
   // 調用函數以查找和顯示重複項
+
+  if (total === 0) {
+    raffleCloseMessage("抽獎結束", "可抽獎人員不足");
+    document.getElementById("startRaffle-button").disabled = true; // 關閉抽獎跟洗牌按鈕
+  }
+
   findDuplicates();
 }
 //更新可抽禮物清單到網頁
@@ -123,7 +129,7 @@ function updateWinnersList() {
     .getElementById("winnersList")
     .querySelector("tbody"); //將網頁元件winnersList下的tbody表格綁定到此
 
-  tableBody.innerHTML = ""; //重置此html網頁元件
+  tableBody.innerHTML = ""; //重設此html網頁元件
   winners.forEach((winner) => {
     //開始迖代
     const row = tableBody.insertRow(); //在html元件插入一行
@@ -187,7 +193,7 @@ function performRaffle(index) {
         i === index ? "yellow" : "";
     }
 
-    //讓視窗跟著光標跑
+    //讓視窗跟著游標跑
     eligibleParticipantsElements[index].scrollIntoView({
       behavior: "smooth",
       block: "center",
@@ -416,11 +422,11 @@ document
   .getElementById("randomSorting-button")
   .addEventListener("click", sortEligibleParticipantsListByRandom);
 
-// 函數用於查找重複的姓名和郵箱
+// 函數用於查找重複的姓名和信箱
 function findDuplicates() {
   let nameMap = {}; // 用於記錄名字
-  let emailMap = {}; // 用於記錄郵箱
-  let duplicates = { names: [], emails: [] }; // 用於存儲重複的名字和郵箱
+  let emailMap = {}; // 用於記錄信箱
+  let duplicates = { names: [], emails: [] }; // 用於儲存重複的名字和信箱
 
   participants.forEach((participant) => {
     // 檢查名字是否重複
@@ -430,15 +436,15 @@ function findDuplicates() {
       nameMap[participant.name] = true; // 否則記錄該名字
     }
 
-    // 檢查郵箱是否重複
+    // 檢查信箱是否重複
     if (emailMap[participant.email]) {
-      duplicates.emails.push(participant); // 如果郵箱已存在，推入重複名單
+      duplicates.emails.push(participant); // 如果信箱已存在，推入重複名單
     } else {
-      emailMap[participant.email] = true; // 否則記錄該郵箱
+      emailMap[participant.email] = true; // 否則記錄該信箱
     }
   });
 
-  // 顯示重複的名字和郵箱
+  // 顯示重複的名字和信箱
   displayDuplicates(duplicates);
 
   // 返回重複項數組以備進一步處理
@@ -447,7 +453,7 @@ function findDuplicates() {
 
 // 函數用於在頁面上顯示重複項
 function displayDuplicates(duplicates) {
-  // 假設頁面上有兩個列表用於顯示重複的名字和郵箱
+  // 假設頁面上有兩個列表用於顯示重複的名字和信箱
   const nameList = document.getElementById("duplicateNamesList");
   const emailList = document.getElementById("duplicateEmailsList");
 
@@ -468,9 +474,9 @@ function displayDuplicates(duplicates) {
 
   if (duplicates.names.length === 0) {
     duplicateNamesCount.style.display = "inline-block"; // 使徽章可見
-    // 如果沒有重複項，顯示綠色打勾圖標
+    // 如果沒有重複項，顯示綠色打勾圖示
     duplicateNamesCount.className = "badge bg-success rounded-pill";
-    // 使用 Bootstrap Icons 或其他圖標庫的圖標類（如下面示例使用了 Font Awesome）
+    // 使用 Bootstrap Icons 或其他圖示庫的圖示類（如下面範例使用了 Font Awesome）
     duplicateNamesCount.innerHTML =
       '<i class="fa fa-check" aria-hidden="true"></i>';
   } else {
@@ -480,7 +486,7 @@ function displayDuplicates(duplicates) {
     duplicateNamesCount.textContent = duplicates.names.length;
   }
 
-  // 顯示重複的郵箱
+  // 顯示重複的信箱
   duplicates.emails.forEach((duplicate) => {
     const listItem = document.createElement("li");
     listItem.className = "list-group-item"; // 添加 Bootstrap 列表項樣式
@@ -493,9 +499,9 @@ function displayDuplicates(duplicates) {
 
   if (duplicates.emails.length === 0) {
     duplicateEmailCount.style.display = "inline-block"; // 使徽章可見
-    // 如果沒有重複項，顯示綠色打勾圖標
+    // 如果沒有重複項，顯示綠色打勾圖示
     duplicateEmailCount.className = "badge bg-success rounded-pill";
-    // 使用 Bootstrap Icons 或其他圖標庫的圖標類（如下面示例使用了 Font Awesome）
+    // 使用 Bootstrap Icons 或其他圖示庫的圖示類（如下面範例使用了 Font Awesome）
     duplicateEmailCount.innerHTML =
       '<i class="fa fa-check" aria-hidden="true"></i>';
   } else {
@@ -514,7 +520,7 @@ function searchParticipant() {
   ul = document.getElementById("searchResults");
   ul.innerHTML = ""; // 清空之前的搜索結果
 
-  // 遍歷參與者
+  // 遍歷參與者數據來尋找匹配項
   for (i = 0; i < participants.length; i++) {
     txtValue = participants[i].name;
     if (txtValue.toUpperCase().indexOf(filter) > -1) {
@@ -595,4 +601,17 @@ function checkAndToggleRaffleButton() {
   if (canRaffle === false) {
     startRaffleButton.disabled = true;
   }
+}
+
+function raffleCloseMessage(messageTitle, message) {
+  const errorModalElement = document.getElementById("errorModal"); //綁定index.html下的errorModal元件
+  const errorModalElementTitle = document.getElementById("errorModalTitle");
+  const errorModalMessageElement = document.getElementById("errorModalMessage"); //綁定index.html下的errorModalMessage元件
+
+  //設置彈出視窗的錯誤訊息
+  errorModalElementTitle.textContent = messageTitle;
+  errorModalMessageElement.textContent = message;
+
+  const errorModal = new bootstrap.Modal(errorModalElement); //顯示錯誤彈出視窗
+  errorModal.show();
 }

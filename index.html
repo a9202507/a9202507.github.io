@@ -2,7 +2,7 @@
 <html lang="zh-TW">
   <head>
     <meta charset="UTF-8" />
-    <title>Lucky Draw Rev0.4.5.1</title>
+    <title>Lucky Draw Rev0.4.7</title>
     <!-- 引入 Bootstrap 的 CSS -->
     <link
       rel="stylesheet"
@@ -31,7 +31,7 @@
       }
 
       footer {
-        /*background: #0A8276; 淡色為9bc3b7
+        /*background: #9bc3b7; 淡色為9bc3b7
         /*position: fixed;
         left: 0;
         bottom: 0;*/
@@ -76,7 +76,7 @@
 
       @media (max-width: 768px) {
         .responsive-input {
-          font-size: 24px; /* 小屏幕時降低字體大小 */
+          font-size: 24px; /* 小螢幕時降低字體大小 */
         }
       }
 
@@ -91,18 +91,36 @@
       .tooltip-inner {
         font-size: 1.1rem; /* 設置您想要的字體大小 */
       }
+
+      .img-container {
+        position: relative;
+        background-color: #9bc3b7;
+        width: 100%; /* 或者根據需要設置特定寬度 */
+        /*height: 3px; /* 設置容器高度 */
+      }
+      .overlay-logo {
+        position: absolute;
+        top: 10px; /* 根據需要調整 */
+        left: 15px; /* 根據需要調整 */
+      }
     </style>
   </head>
   <body class="bg-light">
     <div id="content" class="container py-5">
-      <a href="/">
-        
-      </a>
+      <div class="img-container">
+        <a href="/">
+          <img
+            src="https://www.infineon.com/frontend/release_2023-01/dist/resources/img/logo-desktop-en.png"
+            alt="Infineon logo"
+            class="overlay-logo"
+          />
+        </a>
+      </div>
       <form
         class="text-center mb-4"
         role="form"
         aria-label="抽獎表單"
-        style="background-color: #0a8276; width: 100%"
+        style="background-color: #9bc3b7; width: 100%"
       >
         <label for="main_title" class="visually-hidden">活動標題</label>
         <input
@@ -112,10 +130,10 @@
           name="欄位名稱"
           placeholder="請輸入活動標題"
           aria-label="請輸入活動標題"
-          value="Rev0.4.5.1 這邊是活動標題"
+          value="Rev0.4.7 Event Title"
           style="
             color: white;
-            background-color: #0a8276;
+            background-color: #9bc3b7;
             border: none;
             outline: none;
           "
@@ -125,7 +143,7 @@
       <div id="content"></div>
       <div class="mb-3">
         <label for="namesFile" class="form-label"
-          >請上傳人員名單 (name.csv):</label
+          >Please upload players list(name.csv):</label
         >
         <a href="./demofile/demo_name_10.csv">example file</a>
         <input type="file" class="form-control" id="namesFile" accept=".csv" />
@@ -133,7 +151,7 @@
 
       <div class="mb-3">
         <label for="giftsFile" class="form-label"
-          >請上傳獎品清單 (gift.csv):</label
+          >Please upload the prizes list(gift.csv):</label
         >
         <a href="./demofile/demo_gift.csv">example file</a>
         <input type="file" class="form-control" id="giftsFile" accept=".csv" />
@@ -146,7 +164,7 @@
             <!--<span class="input-group-text" id="drawSecondsLabel">Running Sec</span>
             <input id="drawSecondvalue" type="text" class="form-control" value="7" aria-label="Draw seconds" aria-describedby="drawSecondsLabel"> -->
             <span class="input-group-text" id="drawSecondsLabel"
-              >摸彩亂數區間設定</span
+              >Lucky Zone</span
             >
             <input
               id="drawSecondvalueMin"
@@ -158,9 +176,9 @@
               min="0"
               data-bs-toggle="tooltip"
               data-bs-placement="bottom"
-              title="輸入摸彩時間最小值"
+              title="Lucky zone interval minimum"
             />
-            <span class="input-group-text">秒</span>
+            <span class="input-group-text">Sec</span>
             <span class="input-group-text">~</span>
             <input
               id="drawSecondvalueMax"
@@ -172,20 +190,20 @@
               min="2"
               data-bs-toggle="tooltip"
               data-bs-placement="top"
-              title="輸入摸彩時間最大值"
+              title="Lucky zone interval maximum"
             />
-            <span class="input-group-text">秒</span>
+            <span class="input-group-text">Sec</span>
           </div>
         </div>
         <button id="randomSorting-button" class="btn btn-lg btn-warning">
-          洗牌
+          Shuffle
         </button>
         <button
           onclick="startRaffle()"
           class="btn btn-lg btn-primary"
           id="startRaffle-button"
         >
-          洗牌並且抽獎
+          Shuffle and lottery
         </button>
         <!--
         <button
@@ -276,7 +294,7 @@
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">錯誤提示</h5>
+              <h5 class="modal-title" id="errorModalTitle">錯誤提示</h5>
               <button
                 type="button"
                 class="btn-close"
@@ -358,8 +376,8 @@
           <div class="col-md-3">
             <div class="d-flex align-items-center mb-2">
               <!-- 使用Bootstrap的Flexbox實現標題和搜索按鈕在同一行 -->
-              <h2 class="mb-0">可參加抽獎人員</h2>
-              <!-- "可參加抽獎人員" 標題旁邊的放大鏡圖標按鈕 -->
+              <h2 class="mb-0">Participants</h2>
+              <!-- "可參加抽獎人員" 標題旁邊的放大鏡圖示按鈕 -->
               <button
                 type="button"
                 class="btn btn-primary btn-sm"
@@ -367,11 +385,13 @@
                 data-bs-target="#searchModal"
               >
                 <i class="fas fa-search"></i>
-                <!-- 使用Font Awesome圖標庫的搜索圖標 -->
+                <!-- 使用Font Awesome圖示庫的搜索圖示 -->
               </button>
             </div>
 
-            <div>尚未中獎人數: <span id="totalParticipants">0</span></div>
+            <div>
+              Number of Participants: <span id="totalParticipants">0</span>
+            </div>
             <ul id="eligibleParticipantsList" class="list-group">
               <!-- 通過JS動態填充 -->
             </ul>
@@ -379,8 +399,8 @@
 
           <!-- 未開出獎項 -->
           <div class="col-md-3">
-            <h2>未開出獎項</h2>
-            <div>剩餘數量: <span id="totalPrizes">0</span></div>
+            <h2>Available prizes</h2>
+            <div>Qty of prizes: <span id="totalPrizes">0</span></div>
             <ul id="availablePrizesList" class="list-group">
               <!-- 通過JS動態填充 -->
             </ul>
@@ -389,7 +409,7 @@
           <!-- 歷史中獎記錄 -->
           <div class="col-md-6">
             <div class="d-flex justify-content-between">
-              <h2>歷史中獎記錄</h2>
+              <h2>Lucky draw record</h2>
 
               <button
                 type="button"
@@ -400,14 +420,14 @@
                 Download report
               </button>
             </div>
-            <div>中獎總人數: <span id="totalWinner">0</span></div>
+            <div>Number of winners: <span id="totalWinner">0</span></div>
             <table id="winnersList" class="table">
-              <thead style="background-color: #0a8276; color: white">
+              <thead style="background-color: #9bc3b7; color: white">
                 <tr>
-                  <th>姓名</th>
-                  <th>工號</th>
-                  <th>部門</th>
-                  <th>所獲獎品</th>
+                  <th>Name</th>
+                  <th>ID</th>
+                  <th>Department</th>
+                  <th>prize</th>
                   <!-- <th>中獎時間</th> -->
                 </tr>
               </thead>
@@ -432,7 +452,9 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="searchModalLabel">搜索參加抽獎人員</h5>
+            <h5 class="modal-title" id="searchModalLabel">
+              Search name of participant
+            </h5>
             <button
               type="button"
               class="btn-close"
@@ -446,17 +468,17 @@
               id="searchInput"
               class="form-control"
               oninput="searchParticipant()"
-              placeholder="請輸入搜索的姓名..."
+              placeholder="pleaes input participant's name"
             />
             <ul id="searchResults" class="list-group mt-2"></ul>
           </div>
         </div>
       </div>
     </div>
-    <!-- 頁腳 -->
+    <!-- 頁尾 -->
     <footer class="text-center mt-auto py-4">
       <a>&copy; 2023 lucky draw, </a>
-      
+      <a href="https://github.com/a9202507/luckydraw_homework">Source code</a>
     </footer>
 
     <!-- 引入 Bootstrap 的 JavaScript 和 raffle.js -->
